@@ -28,11 +28,8 @@ void *ft_realloc(void *ptr, size_t originalLength, size_t newLength)
 			return ptrNew;
 		}
 		return (0);
-
 	}
 }
-
-
 
 
 char *read_ln(void)
@@ -51,10 +48,15 @@ char *read_ln(void)
 		// read char
 		c = getchar();
 		// EOF and crln to \0
-		if (c == EOF || c == '\n')
+		if (c == '\n')
 		{
 			buffer[pos] = '\0';
 			return (buffer);
+		}
+		else if (c == EOF)
+		{
+			ft_putstr("\nTerminated by user\n");
+			exit (-111);
 		}
 		else
 			buffer[pos] = c;
@@ -71,4 +73,32 @@ char *read_ln(void)
 			}
 		}
 	}
+}
+
+char	*ft_strjoiner(char const *s1, char const *s2)
+{
+	char	*new_arr;
+	int		i;
+	int		j;
+
+	i = 0;
+	j = 0;
+	if (s1 == NULL || s2 == NULL)
+		return (NULL);
+	new_arr = ft_strnew(ft_strlen(s1) + ft_strlen(s2) + 1);
+	if (new_arr == NULL)
+		return (NULL);
+	while (s1[i] != '\0')
+	{
+		new_arr[i] = s1[i];
+		++i;
+	}
+	new_arr[i++] = '/';
+	while (s2[j] != '\0')
+	{
+		new_arr[i] = s2[j];
+		++j;
+		++i;
+	}
+	return (new_arr);
 }

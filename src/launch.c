@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-
+extern char **environ;
 //	char *args[2];
 //	args[0] = "/bin/ls";
 //	args[1] = "-lh";
@@ -13,26 +13,30 @@ int launch_proc(char **args)
 	pid_t	pid;
 	pid_t	wpid;
 	int		status;
-	char 	**pathes;
+	char 	**paths;
 	int		i;
+	char	*str;
 
 	pid = fork();
-	pathes = ft_strsplit(env_path("PATH"), ':');
+	signal(SIGINT, proc_signal_handler);
+	paths = ft_strsplit(env_path("PATH"), ':');
 	i = 0;
 	if (pid == 0)
 	{
 		// new process
 //		if (execvp(args[0], args) == -1)
 //			printf("minishell: command not found: %s\n", args[0]);
-		if (execve(args[0], args, g_env) == -1)
+		if (execve(args[0], args, vault->arr) == -1)
 		{
-			while (pathes[i] != NULL)
+			while (paths[i] != NULL)
 			{
-				if (execve(args[0], args, g_env) != -1)
+				str = ft_strjoiner(paths[i], args[0]);
+				if (execve(str, args, environ) != -1)
 				{
-
+					return(1);
 				}
 				i++;
+				free(str);
 			}
 
 			printf("minishell: command not found: %s\n", args[0]);
@@ -54,22 +58,22 @@ int launch_proc(char **args)
 	return (1);
 }
 
-char	**environ_grab()
+void	environ_grab()
 {
 	extern char **environ;
-	char **env;
+//	char **env;
 	int i = 0;
+	char *key;
+	char *path;
 
-	env = ft_memalloc(300);
 	while (environ[i] != NULL)
 	{
-		env[i] = ft_memalloc(500);
-		ft_strcpy(env[i], environ[i]);
+		append_env(g_env, environ[i]);
+//		ft_strcpy(env[i], environ[i]);
 		i++;
 
 	}
-	env[i] = 0;
-	return (env);
+//	return (env);
 
 }
 

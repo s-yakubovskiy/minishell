@@ -27,23 +27,17 @@ int		num_shell_functions()
 int		cd_shell(char **args)
 {
 	if (args[1] == NULL)
+		chdir(env_path("HOME"));
+	else if (chdir(args[1]) != 0)
 	{
-		ft_putendl_fd("minishell: need argument for \"cd\"\n", 2);
-	}
-	else
-	{
-
-		if (chdir(args[1]) != 0)
+		if (args[1][0] == '~' && args[1][1] == '\0')
 		{
-			if (args[1][0] == '~' && args[1][1] == '\0')
-			{
-				chdir(env_path("HOME"));
-			}
-			else if (args[1][0] == '-' && args[1][1] == '\0')
-				chdir(env_path("OLDPWD"));
-			else
-				ft_putendl_fd("minishell chdir err", 2);
+			chdir(env_path("HOME"));
 		}
+		else if (args[1][0] == '-' && args[1][1] == '\0')
+			chdir(env_path("OLDPWD"));
+		else
+			ft_putendl_fd("minishell chdir err", 2);
 	}
 	return 1;
 }
@@ -87,5 +81,5 @@ int		launch_dispatcher(char **args)
 		}
 		i++;
 	}
-	return launch_proc(args);
+	return (launch_proc(args));
 }

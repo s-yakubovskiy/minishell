@@ -1,54 +1,118 @@
 #include "minishell.h"
 
-t_env*	create_env(int index, char *key, char *path, t_env* next)
+static char	*strcpy_n(char *dst, const char *src, char c)
+{
+	int		i;
+
+	i = -1;
+	while (src[++i])
+	{
+		if (src[i] == c)
+		{
+			dst[i] = '\0';
+			return (dst);
+		}
+		dst[i] = src[i];
+	}
+	dst[i] = '\0';
+	return (dst);
+}
+
+static char	*strcpy_n2(char *dst, const char *src, char c)
+{
+	int		i;
+	int 	j;
+
+	i = -1;
+	j = 0;
+	while (src[++i])
+	{
+		if (src[i] == c)
+			break ;
+	}
+	if (i > 0)
+	{
+		while (src[++i])
+		{
+			dst[j] = src[i];
+			j++;
+		}
+	}
+	dst[j] = '\0';
+	return (dst);
+}
+
+static char	*strcpy_n3(char *dst, const char *src, char *src2)
+{
+	int		i;
+	int 	j;
+
+	i = -1;
+	j = -1;
+	while (src[++i])
+	{
+		dst[i] = src[i];
+	}
+	dst[i] = '=';
+	while (src2[++j])
+	{
+		dst[++i] = src2[j];
+	}
+	dst[++i] = '\0';
+	return (dst);
+}
+
+t_env*	create_env(int index, char *env, t_env *next)
 {
 	t_env	*new_env;
 
 	new_env = (t_env*)malloc(sizeof(t_env));
+//	printf("%s", env);
 	if(new_env == NULL)
 	{
 		printf("Error creating a new t_env.\n");
 		exit(0);
 	}
 	new_env->index = index;
-	ft_strcpy(new_env->path, path);
-	ft_strcpy(new_env->key, key);
+	strcpy_n2(new_env->path, env, '=');
+	strcpy_n(new_env->key, env, '=');
+//	ft_strcpy(new_env->key, key);
 	new_env->next = next;
-
 	return (new_env);
 }
 
 t_env	*prepend_env(t_env *head, char *key, char *path)
 {
-	t_env	*new_env;
-
-	if (!(head))
-		head->index = 0;
-	new_env = create_env(head->index + 1, key, path, head);
-	head = new_env;
+//	t_env	*new_env;
+//
+//	if (!(head))
+//		head->index = 0;
+//	new_env = create_env(head->index + 1, key, path, head);
+//	head = new_env;
 	return (head);
 }
 
-t_env	*append_env(t_env *head, char *key, char *path)
+t_env	*append_env(t_env *head, char *env)
 {
 	t_env	*new_node;
 
-	if(head == NULL)
-		return NULL;
+	if (head == NULL)
+	{
+		g_env = create_env(0, env, NULL);
+		return (g_env);
+	}
 	/* go to the last t_env */
-	t_env	*cursor;
-	cursor = head;
-	while(cursor->next != NULL)
-		cursor = cursor->next;
+	t_env	*ptr;
+	ptr = head;
+	while(ptr->next != NULL)
+		ptr = ptr->next;
 
 	/* create a new t_env */
-	new_node =  create_env(cursor->index + 1, key, path, NULL);
-	cursor->next = new_node;
+	new_node =  create_env(ptr->index + 1, env, NULL);
+	ptr->next = new_node;
 
 	return (head);
 }
-
-
 
 t_env	*remove_front_env(t_env* head)
 {
@@ -72,22 +136,22 @@ t_env	*remove_back_env(t_env* head)
 	if(head == NULL)
 		return NULL;
 
-	t_env *cursor = head;
+	t_env *ptr = head;
 	t_env *back = NULL;
-	while(cursor->next != NULL)
+	while(ptr->next != NULL)
 	{
-		back = cursor;
-		cursor = cursor->next;
+		back = ptr;
+		ptr = ptr->next;
 	}
 
 	if(back != NULL)
 		back->next = NULL;
 
 	/* if this is the last t_env in the list*/
-	if(cursor == head)
+	if(ptr == head)
 		head = NULL;
 
-	free(cursor);
+	free(ptr);
 	return head;
 }
 
@@ -105,65 +169,63 @@ t_env	*remove_any_env(t_env *head, t_env *nd)
 		return remove_back_env(head);
 
 	/* if the t_env is in the middle */
-	t_env* cursor = head;
-	while(cursor != NULL)
+	t_env* ptr = head;
+	while(ptr != NULL)
 	{
-		if(cursor->next == nd)
+		if(ptr->next == nd)
 			break;
-		cursor = cursor->next;
+		ptr = ptr->next;
 	}
-
-	if(cursor != NULL)
+	if(ptr != NULL)
 	{
-		t_env* tmp = cursor->next;
-		cursor->next = tmp->next;
+		t_env* tmp = ptr->next;
+		ptr->next = tmp->next;
 		tmp->next = NULL;
 		free(tmp);
 	}
 	return head;
-
 }
 
 t_env	*search_key(t_env *head, char *key)
 {
-	t_env	*cursor;
+	t_env	*ptr;
 
-	cursor = head;
-	while(cursor != NULL)
+	ptr = head;
+	while(ptr != NULL)
 	{
-		if(ft_strcmp(cursor->key, key) == 0)
-			return cursor;
-		cursor = cursor->next;
+		if(ft_strcmp(ptr->key, key) == 0)
+			return ptr;
+		ptr = ptr->next;
 	}
 	return (NULL);
 }
 
 void	dispose_env(t_env *head)
 {
-	t_env	*cursor;
+	t_env	*ptr;
 	t_env	*tmp;
 
 	if(head != NULL)
 	{
-		cursor = head->next;
+		ptr = head->next;
 		head->next = NULL;
-		while(cursor != NULL)
+		while(ptr != NULL)
 		{
-			tmp = cursor->next;
-			free(cursor);
-			cursor = tmp;
+			tmp = ptr->next;
+			free(ptr);
+			ptr = tmp;
 		}
 	}
 }
 
 int		count_env(t_env *head)
 {
-	t_env *cursor = head;
+	t_env *ptr = head;
 	int c = 0;
-	while(cursor != NULL)
+	while(ptr != NULL)
 	{
 		c++;
-		cursor = cursor->next;
+		ptr = ptr->next;
 	}
 	return (c);
 }
@@ -171,5 +233,28 @@ int		count_env(t_env *head)
 void	display_env(t_env *n)
 {
 	if(n != NULL)
-		printf("%s=%s", n->key, n->path);
+		printf("%s=%s\n", n->key, n->path);
+}
+
+void	grab_vault(t_env *n)
+{
+	if(n != NULL)
+	{
+
+		strcpy_n3(vault->arr[vault->index], n->key, n->path);
+		vault->index += 1;
+//		printf("%s=%s\n", n->key, n->path);
+	}
+}
+
+void	traverse(t_env *head, callback f)
+{
+	t_env	*ptr;
+
+	ptr = head;
+	while(ptr != NULL)
+	{
+		f(ptr);
+		ptr = ptr->next;
+	}
 }
