@@ -1,12 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sig_handler.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yharwyn- <yharwyn-@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/05/20 19:38:51 by yharwyn-          #+#    #+#             */
+/*   Updated: 2019/05/20 19:38:51 by yharwyn-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
-
-
-/*
-** Handles interruption signals on a running process
-**
-** @param		signo		The signal number
-** @return		N/A
-*/
 
 void	proc_signal_handler(int signo)
 {
@@ -17,19 +21,11 @@ void	proc_signal_handler(int signo)
 	}
 }
 
-/*
-** Handles interruption signals on the program
-**
-** @param		signo		The signal number
-** @return		N/A
-*/
-
 void	signal_handler(int signo)
 {
 	if (signo == SIGINT)
 	{
 		ft_putstr("\n");
-//		display_prompt_msg();
 		signal(SIGINT, signal_handler);
 	}
 }

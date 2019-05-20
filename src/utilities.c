@@ -1,81 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utilities.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yharwyn- <yharwyn-@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/05/20 17:16:07 by yharwyn-          #+#    #+#             */
+/*   Updated: 2019/05/20 19:49:32 by yharwyn-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-void *ft_realloc(void *ptr, size_t originalLength, size_t newLength)
-{
-	if (newLength == 0)
-	{
-		free(ptr);
-		return NULL;
-	}
-	else if (!ptr)
-	{
-		return malloc(newLength);
-	}
-	else if (newLength <= originalLength)
-	{
-		return ptr;
-	}
-	else
-	{
-		if ((newLength > originalLength))
-		{
-			void *ptrNew = malloc(newLength);
-			if (ptrNew)
-			{
-				ft_memcpy(ptrNew, ptr, originalLength);
-				free(ptr);
-			}
-			return ptrNew;
-		}
-		return (0);
-	}
-}
-
-
-char *read_ln(void)
-{
-	int pos = 0;
-	int buffsize = BUFF_LN;
-	char *buffer = ft_memalloc(buffsize);
-	int c;
-
-	if (!buffer) {
-		ft_putendl_fd("minishell: couldn't allocate memory", 2);
-		exit(-8);
-	}
-
-	while (1) {
-		// read char
-		c = getchar();
-		// EOF and crln to \0
-		if (c == '\n')
-		{
-			buffer[pos] = '\0';
-			return (buffer);
-		}
-		else if (c == EOF)
-		{
-			ft_putstr("\nTerminated by user\n");
-			exit (-111);
-		}
-		else
-			buffer[pos] = c;
-		pos++;
-		// Expand buffer
-		if (pos >= buffsize) {
-			buffsize += BUFF_LN;
-
-			buffer = ft_realloc(buffer, pos, buffsize);
-//			buffer = buff_expander(buffer, buffsize);
-			if (!buffer) {
-				ft_putendl_fd("minishell: couldn't allocate memory", 2);
-				exit(-8);
-			}
-		}
-	}
-}
-
-char	*ft_strjoiner(char const *s1, char const *s2)
+char		*ft_strjoiner(char const *s1, char const *s2)
 {
 	char	*new_arr;
 	int		i;
@@ -103,13 +40,68 @@ char	*ft_strjoiner(char const *s1, char const *s2)
 	return (new_arr);
 }
 
-void	getDir(void)
+static void	shift_to_left(char *str)
 {
-	t_vault		*ptr;
-	t_vault		*ptr2;
+	int		i;
+	int		len;
 
-	ptr = search_key(g_env->vault, "PWD");
-	ptr2 = search_key(g_env->vault, "OLDPWD");
-	g_env->vault = remove_any_env(g_env->vault, ptr);
+	i = 0;
+	len = ft_strlen(str) - 1;
+	while (i < len)
+	{
+		str[i] = str[i + 1];
+		i++;
+	}
+	str[i] = '\0';
+}
 
+static char	*string_to_env(char *str)
+{
+	char *line;
+
+	shift_to_left(str);
+	if (search_key(g_env->vault, str) != NULL)
+	{
+		line = ft_memalloc(100);
+		ft_strcpy(line, search_key(g_env->vault, str)->path);
+		ft_memdel((void **)&str);
+		return (line);
+	}
+	return (" ");
+}
+
+void		string_var_parser(char **line)
+{
+	int i;
+	int j;
+
+	i = 0;
+	while (line[i] != 0)
+	{
+		j = 0;
+		while (line[i][j] != '\0' && line[i][0] != '\'')
+		{
+			if (line[i][j] == '$')
+			{
+				line[i] = string_to_env(line[i]);
+				break ;
+			}
+			j++;
+		}
+		i++;
+	}
+}
+
+t_vault		*environ_grab(t_vault *root)
+{
+	extern char	**environ;
+	int			i;
+
+	i = 0;
+	while (environ[i] != NULL)
+	{
+		root = append_env(root, environ[i]);
+		i++;
+	}
+	return (root);
 }

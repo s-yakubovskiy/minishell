@@ -1,166 +1,108 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yharwyn- <yharwyn-@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/05/20 17:41:11 by yharwyn-          #+#    #+#             */
+/*   Updated: 2019/05/20 21:41:11 by yharwyn-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-//void	shell_init()
-//{
-//	clear();
-//	printf("\n\n\n\n******************"
-//		   "****************************");
-//	printf("\n\n\n\t*******MINISHELL PROJECT*******");
-//	printf("\n\n\t-school 21 unix branch project-");
-//	printf("\n\t-use   at  your  own  risk  :D-");
-//	printf("\n\n\n\n*******************"
-//		   "***************************");
-//	char* username = getenv("USER");
-//	printf("\n\n\nUSER is: @%s", username);
-//	printf("\n");
-//	sleep(3);
-//	clear();
-//}
-
-void	shell_loop(void)
+void		shell_init(void)
 {
-	char *line;
-	char **args;
-	int status;
-	t_vault *ptr;
+	char	*username;
 
-	//read the commands of user
-	//parse commands (PC differ command and args)
-	//execute command
+	username = getenv("USER");
+	CLEAR();
+	ft_printf("\n\n\n\n******************"
+	"****************************");
+	ft_printf("\n\n\n\t*******MINISHELL PROJECT*******");
+	ft_printf("\n\n\t-school 21 unix branch project-");
+	ft_printf("\n\t-use   at  your  own  risk  :D-");
+	ft_printf("\n\n\n\n*******************"
+	"***************************");
+	ft_printf("\n\n\nUSER is: @%s", username);
+	ft_printf("\n");
+	sleep(1);
+	CLEAR();
+}
 
-//	shell_init();
+static void	free_args(char **args)
+{
+	int i;
 
+	i = 0;
+	while (args[i] != 0)
+	{
+		ft_memdel((void **)&args[i]);
+		i++;
+	}
+	ft_memdel((void**)&args);
+}
 
+void		shell_loop(void)
+{
+	char	*line;
+	char	**args;
+	int		status;
 
+	shell_init();
 	status = 1;
-
-
-	while (status) {
+	while (status)
+	{
 		signal(SIGINT, signal_handler);
 		ft_printf("$> ");
-//		gotoxy(0, 0);
 		line = read_ln();
 		args = line_split(line, SPLIT_DELIM);
 		status = launch_dispatcher(args);
-//		environ_grab();
 		free(line);
-		free(args);
-//		break ;
-
+		free_args(args);
 	}
 }
 
-static char *extract_path(char *str, char *key)
+void		env_init(t_vault *ptr)
 {
-	int len;
-	int i;
-	int j;
-	char *path;
-
-	len = ft_strlen(str);
-	i = ft_strlen(key) + 1;
-	j = 0;
-	path = ft_memalloc(len);
-	while (str[i] != '\0')
-	{
-		path[j] = str[i];
-		i++;
-		j++;
-	}
-	path[j] = '\0';
-	return (path);
-}
-
-char 	*env_path(char *key)
-{
-	t_vault	*ptr;
-
-	ptr = search_key(g_env->vault, key);
-
-	return (ptr->path);
-}
-
-void	env_init(t_vault *ptr)
-{
-	g_env = malloc(sizeof(t_env));
-	g_env->c_env = ft_memalloc(sizeof(char*) * 300);
-	g_env->c_env[g_env->index] = ft_memalloc(300);
+	g_env = ft_memalloc(sizeof(t_env));
+	g_env->c_env = ft_memalloc(300);
 	g_env->index = 0;
 	g_env->vault = ptr;
-	g_env->updateEnv = update_env;
-	g_env->printEnv = traverse;
-	g_env->getDir = get_cwd;
-	g_env->getDir(search_key(g_env->vault, "PWD")->path);
-	g_env->getDir(search_key(g_env->vault, "OLDPWD")->path);
+	g_env->update_envv = update_env;
+	g_env->print_envv = traverse;
+	g_env->get_dir = get_cwd;
+	g_env->get_dir(search_key(g_env->vault, "PWD")->path);
+	g_env->get_dir(search_key(g_env->vault, "OLDPWD")->path);
+	g_env->builtin_func[0] = &cd_shell;
+	g_env->builtin_func[1] = &help_shell;
+	g_env->builtin_func[2] = &exit_shell;
+	g_env->builtin_func[3] = &set_env;
+	g_env->builtin_func[4] = &set_env;
+	g_env->builtin_func[5] = &unset_env;
+	g_env->builtin_func[6] = &echo;
+	g_env->i = 0;
+	ft_strcpy(g_env->builtin_str[0], "cd");
+	ft_strcpy(g_env->builtin_str[1], "help");
+	ft_strcpy(g_env->builtin_str[2], "exit");
+	ft_strcpy(g_env->builtin_str[3], "env");
+	ft_strcpy(g_env->builtin_str[4], "setenv");
+	ft_strcpy(g_env->builtin_str[5], "unsetenv");
+	ft_strcpy(g_env->builtin_str[6], "echo");
 }
 
-void	get_cwd(char *str)
-{
-	char cwd[256];
-
-	if (chdir(".") != 0)
-		ft_putendl_fd("chdir() error()", 2);
-	else {
-		if (getcwd(cwd, sizeof(cwd)) == NULL)
-			ft_putendl_fd("getcwd() error", 2);
-		else
-		{
-			ft_strclr(str);
-			ft_strcpy(str, cwd);
-		}
-	}
-}
-
-int		main(int argc, char **argv)
+int			main(void)
 {
 	t_vault *ptr;
-
 
 	ptr = NULL;
 	ptr = environ_grab(ptr);
 	env_init(ptr);
 	traverse(g_env->vault, grab_vault);
-
-//	printf("%s", g_env->c_env[5]);
-	t_vault *search;
-
-	search = search_key(g_env->vault, "OLDPWD");
-//	printf("%s\n", g_env->curPwd);
-
-
-
-//	char **str;
-//
-//	str = line_split("   $HOME  is nice $PWD '$HELLO' to $SMTH   ", SPLIT_DELIM);
-//
-//	int i = 0;
-//	while (str[i] != 0)
-//	{
-//		printf("%s\n", str[i]);
-//		i++;
-//	}
-//	string_var_parser(str);
-//
-//
-//	while (str[i] != 0)
-//	{
-//		printf("%s\n", str[i]);
-//		i++;
-//	}
-
-	//load the config
-
-	//run REPL loop (read, evaluate, print loop)
 	shell_loop();
-//
-
-
-
-
-
-
-
-
-	//remove leaks
+	clean_up();
+	dispose_env(g_env->vault);
+	dispose_env(ptr);
 	return (0);
 }

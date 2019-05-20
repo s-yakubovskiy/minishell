@@ -6,7 +6,7 @@
 /*   By: yharwyn- <yharwyn-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/23 12:52:55 by agottlie          #+#    #+#             */
-/*   Updated: 2019/03/27 11:30:06 by yharwyn-         ###   ########.fr       */
+/*   Updated: 2019/05/20 20:41:32 by yharwyn-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,5 +95,7 @@ int					ft_word_count_c(const char *s, char c);
 void				ft_lstchange(t_list **head, void *data);
 void				ft_make_lst(t_list **head, size_t len);
 void				colorize_str(char *str, int mod);
+void				*ft_realloc(void *ptr, size_t original_length,
+		size_t new_length);
 
 #endif
