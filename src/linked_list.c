@@ -62,28 +62,26 @@ static char	*strcpy_n3(char *dst, const char *src, char *src2)
 	return (dst);
 }
 
-t_env*	create_env(int index, char *env, t_env *next)
+t_vault		*create_env(int index, char *line, t_vault *next)
 {
-	t_env	*new_env;
+	t_vault	*new_env;
 
-	new_env = (t_env*)malloc(sizeof(t_env));
-//	printf("%s", env);
+	new_env = (t_vault*)malloc(sizeof(t_vault));
 	if(new_env == NULL)
 	{
-		printf("Error creating a new t_env.\n");
+		printf("Error creating a new t_vault.\n");
 		exit(0);
 	}
 	new_env->index = index;
-	strcpy_n2(new_env->path, env, '=');
-	strcpy_n(new_env->key, env, '=');
-//	ft_strcpy(new_env->key, key);
+	strcpy_n2(new_env->path, line, '=');
+	strcpy_n(new_env->key, line, '=');
 	new_env->next = next;
 	return (new_env);
 }
 
-t_env	*prepend_env(t_env *head, char *key, char *path)
+t_vault	*prepend_env(t_vault *head, char *key, char *path)
 {
-//	t_env	*new_env;
+//	t_vault	*new_env;
 //
 //	if (!(head))
 //		head->index = 0;
@@ -92,52 +90,52 @@ t_env	*prepend_env(t_env *head, char *key, char *path)
 	return (head);
 }
 
-t_env	*append_env(t_env *head, char *env)
+t_vault	*append_env(t_vault *head, char *line)
 {
-	t_env	*new_node;
+	t_vault	*new_node;
 
 	if (head == NULL)
 	{
-		g_env = create_env(0, env, NULL);
-		return (g_env);
+		head = create_env(0, line, NULL);
+		return (head);
 	}
-	/* go to the last t_env */
-	t_env	*ptr;
+	/* go to the last t_vault */
+	t_vault	*ptr;
 	ptr = head;
 	while(ptr->next != NULL)
 		ptr = ptr->next;
 
-	/* create a new t_env */
-	new_node =  create_env(ptr->index + 1, env, NULL);
+	/* create a new t_vault */
+	new_node =  create_env(ptr->index + 1, line, NULL);
 	ptr->next = new_node;
 
 	return (head);
 }
 
-t_env	*remove_front_env(t_env* head)
+t_vault	*remove_front_env(t_vault* head)
 {
 	if(head == NULL)
 		return NULL;
-	t_env *front = head;
+	t_vault *front = head;
 	head = head->next;
 	front->next = NULL;
-	/* is this the last t_env in the list */
+	/* is this the last t_vault in the list */
 	if(front == head)
 		head = NULL;
 	free(front);
-	return head;
+	return (head);
 }
 
 /*
-    remove t_env from the back of the list
+    remove t_vault from the back of the list
 */
-t_env	*remove_back_env(t_env* head)
+t_vault	*remove_back_env(t_vault* head)
 {
 	if(head == NULL)
 		return NULL;
 
-	t_env *ptr = head;
-	t_env *back = NULL;
+	t_vault *ptr = head;
+	t_vault *back = NULL;
 	while(ptr->next != NULL)
 	{
 		back = ptr;
@@ -147,29 +145,29 @@ t_env	*remove_back_env(t_env* head)
 	if(back != NULL)
 		back->next = NULL;
 
-	/* if this is the last t_env in the list*/
+	/* if this is the last t_vault in the list*/
 	if(ptr == head)
 		head = NULL;
 
 	free(ptr);
-	return head;
+	return (head);
 }
 
 
-t_env	*remove_any_env(t_env *head, t_env *nd)
+t_vault	*remove_any_env(t_vault *head, t_vault *nd)
 {
 	if(nd == NULL)
 		return NULL;
-	/* if the t_env is the first t_env */
+	/* if the t_vault is the first t_vault */
 	if(nd == head)
 		return remove_front_env(head);
 
-	/* if the t_env is the last t_env */
+	/* if the t_vault is the last t_vault */
 	if(nd->next == NULL)
 		return remove_back_env(head);
 
-	/* if the t_env is in the middle */
-	t_env* ptr = head;
+	/* if the t_vault is in the middle */
+	t_vault* ptr = head;
 	while(ptr != NULL)
 	{
 		if(ptr->next == nd)
@@ -178,17 +176,17 @@ t_env	*remove_any_env(t_env *head, t_env *nd)
 	}
 	if(ptr != NULL)
 	{
-		t_env* tmp = ptr->next;
+		t_vault* tmp = ptr->next;
 		ptr->next = tmp->next;
 		tmp->next = NULL;
 		free(tmp);
 	}
-	return head;
+	return (head);
 }
 
-t_env	*search_key(t_env *head, char *key)
+t_vault	*search_key(t_vault *head, char *key)
 {
-	t_env	*ptr;
+	t_vault	*ptr;
 
 	ptr = head;
 	while(ptr != NULL)
@@ -200,10 +198,10 @@ t_env	*search_key(t_env *head, char *key)
 	return (NULL);
 }
 
-void	dispose_env(t_env *head)
+void	dispose_env(t_vault *head)
 {
-	t_env	*ptr;
-	t_env	*tmp;
+	t_vault	*ptr;
+	t_vault	*tmp;
 
 	if(head != NULL)
 	{
@@ -218,9 +216,9 @@ void	dispose_env(t_env *head)
 	}
 }
 
-int		count_env(t_env *head)
+int		count_env(t_vault *head)
 {
-	t_env *ptr = head;
+	t_vault *ptr = head;
 	int c = 0;
 	while(ptr != NULL)
 	{
@@ -230,26 +228,25 @@ int		count_env(t_env *head)
 	return (c);
 }
 
-void	display_env(t_env *n)
+void	display_env(t_vault *n)
 {
 	if(n != NULL)
 		printf("%s=%s\n", n->key, n->path);
 }
 
-void	grab_vault(t_env *n)
+void	grab_vault(t_vault *n)
 {
 	if(n != NULL)
 	{
-
-		strcpy_n3(vault->arr[vault->index], n->key, n->path);
-		vault->index += 1;
-//		printf("%s=%s\n", n->key, n->path);
+		g_env->c_env[g_env->index] = ft_memalloc(sizeof(char) * 300);
+		strcpy_n3(g_env->c_env[g_env->index], n->key, n->path);
+		g_env->index += 1;
 	}
 }
 
-void	traverse(t_env *head, callback f)
+void	traverse(t_vault *head, callback f)
 {
-	t_env	*ptr;
+	t_vault	*ptr;
 
 	ptr = head;
 	while(ptr != NULL)
@@ -257,4 +254,20 @@ void	traverse(t_env *head, callback f)
 		f(ptr);
 		ptr = ptr->next;
 	}
+}
+
+
+static void	clean_up()
+{
+	while (g_env->index >= 0)
+	{
+		ft_memdel((void **)&g_env->c_env[g_env->index]);
+		g_env->index -= 1;
+	}
+}
+void	update_env()
+{
+	clean_up();
+	traverse(g_env->vault, grab_vault);
+//	ft_memdel((void **)&arr);
 }

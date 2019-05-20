@@ -94,4 +94,70 @@ char		**line_split(char const *s, char *delim)
 	return (new_arr);
 }
 
+static void shift_to_left(char *str)
+{
+	int i = 0;
+	int len;
+	char c;
 
+	len = ft_strlen(str) - 1;
+	while (i < len)
+	{
+		str[i] = str[i + 1];
+		i++;
+	}
+	str[i] = '\0';
+}
+
+static char	*string_to_env(char *str)
+{
+	char *line;
+
+//	ft_strnc
+	shift_to_left(str);
+
+
+	if (search_key(g_env->vault, str) != NULL )
+	{
+		line = ft_memalloc(100);
+		ft_strcpy(line, search_key(g_env->vault, str)->path);
+		ft_memdel((void **)&str);
+//		printf(">HI %s\n", line);
+		return (line);
+	}
+	return (" ");
+
+}
+
+void	string_var_parser(char **line)
+{
+	int i;
+	int j;
+	char *fix;
+
+	i = 0;
+
+	while (line[i] != 0)
+	{
+		j = 0;
+		while (line[i][j] != '\0' && line[i][0] != '\'')
+		{
+			if (line[i][j] == '$')
+			{
+				line[i] = string_to_env(line[i]);
+				break ;
+			}
+			j++;
+		}
+		i++;
+	}
+
+//	i = 0;
+//	while (line[i] != 0)
+//	{
+//		printf("%s\n", line[i]);
+//		i++;
+//	}
+
+//	return (NULL);
+}

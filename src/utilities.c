@@ -102,3 +102,14 @@ char	*ft_strjoiner(char const *s1, char const *s2)
 	}
 	return (new_arr);
 }
+
+void	getDir(void)
+{
+	t_vault		*ptr;
+	t_vault		*ptr2;
+
+	ptr = search_key(g_env->vault, "PWD");
+	ptr2 = search_key(g_env->vault, "OLDPWD");
+	g_env->vault = remove_any_env(g_env->vault, ptr);
+
+}

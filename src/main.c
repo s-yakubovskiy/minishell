@@ -17,17 +17,20 @@
 //	clear();
 //}
 
-void	shell_loop(void) {
+void	shell_loop(void)
+{
 	char *line;
 	char **args;
 	int status;
+	t_vault *ptr;
 
 	//read the commands of user
 	//parse commands (PC differ command and args)
 	//execute command
 
 //	shell_init();
-	environ_grab();
+
+
 
 	status = 1;
 
@@ -70,101 +73,94 @@ static char *extract_path(char *str, char *key)
 
 char 	*env_path(char *key)
 {
-	t_env	*ptr;
+	t_vault	*ptr;
 
-	ptr = search_key(g_env, key);
+	ptr = search_key(g_env->vault, key);
 
 	return (ptr->path);
 }
 
+void	env_init(t_vault *ptr)
+{
+	g_env = malloc(sizeof(t_env));
+	g_env->c_env = ft_memalloc(sizeof(char*) * 300);
+	g_env->c_env[g_env->index] = ft_memalloc(300);
+	g_env->index = 0;
+	g_env->vault = ptr;
+	g_env->updateEnv = update_env;
+	g_env->printEnv = traverse;
+	g_env->getDir = get_cwd;
+	g_env->getDir(search_key(g_env->vault, "PWD")->path);
+	g_env->getDir(search_key(g_env->vault, "OLDPWD")->path);
+}
+
+void	get_cwd(char *str)
+{
+	char cwd[256];
+
+	if (chdir(".") != 0)
+		ft_putendl_fd("chdir() error()", 2);
+	else {
+		if (getcwd(cwd, sizeof(cwd)) == NULL)
+			ft_putendl_fd("getcwd() error", 2);
+		else
+		{
+			ft_strclr(str);
+			ft_strcpy(str, cwd);
+		}
+	}
+}
 
 int		main(int argc, char **argv)
 {
-	char *str;
-	char *path;
-	char **pathes;
-	t_env *ptr;
-//	t_arr_env *vault;
+	t_vault *ptr;
+
+
+	ptr = NULL;
+	ptr = environ_grab(ptr);
+	env_init(ptr);
+	traverse(g_env->vault, grab_vault);
+
+//	printf("%s", g_env->c_env[5]);
+	t_vault *search;
+
+	search = search_key(g_env->vault, "OLDPWD");
+//	printf("%s\n", g_env->curPwd);
 
 
 
+//	char **str;
+//
+//	str = line_split("   $HOME  is nice $PWD '$HELLO' to $SMTH   ", SPLIT_DELIM);
+//
+//	int i = 0;
+//	while (str[i] != 0)
+//	{
+//		printf("%s\n", str[i]);
+//		i++;
+//	}
+//	string_var_parser(str);
+//
+//
+//	while (str[i] != 0)
+//	{
+//		printf("%s\n", str[i]);
+//		i++;
+//	}
 
 	//load the config
 
 	//run REPL loop (read, evaluate, print loop)
-//	shell_loop();
-//	g_env = malloc_env();
-
-//	append_env(g_env, "HOMEBREW_TEMP=/tmp/yharwyn-/Homebrew/Temp");
-//	printf("%s", g_env->key);
+	shell_loop();
+//
 
 
 
-	environ_grab();
-//	traverse(g_env, display_env);
-//	str = env_path("OLDPWD");
-
-	vault = malloc(sizeof(t_arr_env));
-	vault->index = 0;
-
-	traverse(g_env, grab_vault);
-	printf("%s", vault->arr[5]);
-//	ft_strcpy(vault->arr[0], "HELLO");
-//	printf("%s\n", vault->arr[0]);
-
-//	traverse(g_env, display_env);
 
 
-//	t_env *key;
-//	key = search_key(g_env, "PAGER");
-//	printf("%s", key->path);
 
 
-//	path = env_path("PATH");
-//	printf("%s", path);
 
-//	pathes = ft_strsplit(env_path("PATH"), ':');
-
-//	int i = 0;
-//	while (pathes[i] != NULL)
-//	{
-//		printf("%s\n",pathes[i]);
-//		i++;
-//	}
-
-//	int i = 0;
-
-//	while (g_env[i] != NULL)
-//	{
-//		printf("%s\n",g_env[i]);
-//		i++;
-//	}
-
-//	char* home = getenv("HOME");
-//	printf("\n\n\nHOME is: %s", home);
-
-	//Remove leaks. Clean up
+	//remove leaks
 	return (0);
 }
-
-
-
-//
-//char 	*env_path(char *key)
-//{
-//	int i;
-//	char *path;
-//
-//	i = 0;
-//	while (g_env[i] != NULL)
-//	{
-//		if (ft_strstr(g_env[i], key))
-//		{
-////			printf("%s\n", g_env[i]);
-//			path = extract_path(g_env[i], key);
-//			return (path);
-//		}
-//		i++;
-//	}
-//	return (0);
-//}
