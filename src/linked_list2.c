@@ -6,7 +6,7 @@
 /*   By: yharwyn- <yharwyn-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 17:31:37 by yharwyn-          #+#    #+#             */
-/*   Updated: 2019/05/20 21:45:42 by yharwyn-         ###   ########.fr       */
+/*   Updated: 2019/05/20 22:04:39 by yharwyn-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,11 @@ void		clean_up(void)
 	i = 0;
 	while (g_env->c_env[i] != 0)
 	{
-		free(g_env->c_env[i]);
+		ft_memdel((void **)&g_env->c_env[i]);
 		i++;
 	}
 	ft_memdel((void **)&g_env->c_env);
+	g_env->index = 0;
 }
 
 void		update_env(void)

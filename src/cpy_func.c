@@ -6,7 +6,7 @@
 /*   By: yharwyn- <yharwyn-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 17:33:38 by yharwyn-          #+#    #+#             */
-/*   Updated: 2019/05/20 19:19:47 by yharwyn-         ###   ########.fr       */
+/*   Updated: 2019/05/20 21:54:26 by yharwyn-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,9 @@ void		grab_vault(t_vault *n)
 {
 	if (n != NULL)
 	{
-		g_env->c_env[g_env->index] = ft_memalloc(sizeof(char) * 300);
+		if (g_env->c_env == NULL)
+			g_env->c_env = ft_memalloc(300);
+		g_env->c_env[g_env->index] = ft_memalloc(300);
 		strcpy_n3(g_env->c_env[g_env->index], n->key, n->path);
 		g_env->index += 1;
 	}

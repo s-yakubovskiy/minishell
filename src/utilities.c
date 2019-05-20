@@ -6,7 +6,7 @@
 /*   By: yharwyn- <yharwyn-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 17:16:07 by yharwyn-          #+#    #+#             */
-/*   Updated: 2019/05/20 19:49:32 by yharwyn-         ###   ########.fr       */
+/*   Updated: 2019/05/20 22:14:56 by yharwyn-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,8 @@ static char	*string_to_env(char *str)
 		ft_memdel((void **)&str);
 		return (line);
 	}
-	return (" ");
+	line = ft_strdup(" ");
+	return (line);
 }
 
 void		string_var_parser(char **line)
