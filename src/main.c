@@ -6,7 +6,7 @@
 /*   By: yharwyn- <yharwyn-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 17:41:11 by yharwyn-          #+#    #+#             */
-/*   Updated: 2019/05/20 21:41:11 by yharwyn-         ###   ########.fr       */
+/*   Updated: 2019/07/05 19:40:17 by yharwyn-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,53 @@ void		shell_init(void)
 	CLEAR();
 }
 
+void sigint_handler(int signal)
+{
+	printf("\n");
+}
+
+void mysh_update_cwd_info(void)
+{
+	getcwd(shell->cur_dir, sizeof(shell->cur_dir));
+}
+
+void sh_init()
+{
+	struct sigaction	sigint_action;
+	pid_t				pid;
+	struct passwd		*pw;
+	int					i;
+	extern char 		**environ;
+
+	sigint_action.sa_flags = 0;
+	i = -1;
+	sigint_action.sa_handler = &sigint_handler;
+	sigemptyset(&sigint_action.sa_mask);
+	sigaction(SIGINT, &sigint_action, NULL);
+	signal(SIGQUIT, SIG_IGN);
+	signal(SIGTSTP, SIG_IGN);
+	signal(SIGTTIN, SIG_IGN);
+	pid = getpid();
+	setpgid(pid, pid);
+	tcsetpgrp(0, pid);
+	shell = (shell_info*)malloc(sizeof(shell_info));
+	shell->env = environ;
+	getlogin_r(shell->cur_user, sizeof(shell->cur_user));
+	pw = getpwuid(getuid());
+	strcpy(shell->pw_dir, pw->pw_dir);
+	while (++i < NR_JOBS)
+		shell->jobs[i] = NULL;
+	mysh_update_cwd_info();
+}
+
+void mysh_print_promt(void)
+{
+//	printf(COLOR_CYAN "%s" COLOR_NONE " in " COLOR_YELLOW "%s" COLOR_NONE "\n", shell->cur_user, shell->cur_dir);
+	printf(COLOR_CYAN "21sh>" COLOR_NONE " ");
+}
+
+
+
 static void	free_args(char **args)
 {
 	int i;
@@ -44,22 +91,31 @@ static void	free_args(char **args)
 	ft_memdel((void**)&args);
 }
 
-void		shell_loop(void)
+void		shell_loop()
 {
-	char	*line;
-	char	**args;
-	int		status;
+	char		*line;
+	char		**args;
+	job			*job;
+	int			status;
 
-	shell_init();
+//	shell_init();
+	sh_init();
 	status = 1;
-	while (status)
+	while (status >= 0)
 	{
 		signal(SIGINT, signal_handler);
-		ft_printf("$> ");
+		mysh_print_promt();
 		line = read_ln();
+		if (strlen(line) == 0)
+		{
+			check_zombie();
+			continue ;
+		}
+		job = shell_parse_command(line);
 		args = line_split(line, SPLIT_DELIM);
-		status = launch_dispatcher(args);
-		free(line);
+//		status = launch_dispatcher(args);
+		status = shell_launch_job(job);
+//		free(line);
 		free_args(args);
 	}
 }
@@ -92,17 +148,19 @@ void		env_init(t_vault *ptr)
 	ft_strcpy(g_env->builtin_str[6], "echo");
 }
 
-int			main(void)
+int			main(int argc, char **argv, char **env)
 {
 	t_vault *ptr;
 
 	ptr = NULL;
 	ptr = environ_grab(ptr);
+	const char* s = getenv("PATH");
 	env_init(ptr);
 	traverse(g_env->vault, grab_vault);
 	shell_loop();
-	clean_up();
-	dispose_env(g_env->vault);
-	dispose_env(ptr);
+
+//	clean_up();
+//	dispose_env(g_env->vault);
+//	dispose_env(ptr);
 	return (0);
 }

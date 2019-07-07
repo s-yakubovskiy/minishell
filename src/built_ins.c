@@ -32,10 +32,7 @@ int			help_shell(char **args)
 
 int			exit_shell(char **args)
 {
-	int len;
-
-	len = ft_strlen(args[0]);
-	return (0);
+	return (1);
 }
 
 int			set_env(char **args)
