@@ -44,7 +44,7 @@ typedef struct			s_env
 	int					index;
 	char				**c_env;
 	char				builtin_str[7][20];
-	int					(*builtin_func[7]) (char **);
+	int					(*builtin_func[7]) ();
 	int					i;
 	struct s_vault		*vault;
 	void				(*update_envv)();
@@ -92,12 +92,12 @@ char					*strcpy_till_n(char *dst, const char *src, char c);
 ** 		built-ins funcs
 */
 
-int						cd_shell(char **args);
-int						help_shell(char **args);
-int						exit_shell(char **args);
-int						set_env(char **args);
-int						unset_env(char **args);
-int						echo(char **args);
-int						num_shell_functions(void);
+int						cd_shell(process *proc);
+int						help_shell(process *proc);
+int						exit_shell(process *proc);
+int						set_env(process *proc);
+int						unset_env(process *proc);
+int						echo(process *proc);
+int						num_shell_functions(process *proc);
 
 #endif

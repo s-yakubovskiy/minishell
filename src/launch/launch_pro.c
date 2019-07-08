@@ -137,7 +137,7 @@ int				shell_launch_process(job *job, process *proc, int in_fd, int out_fd, int 
 	childpid = fork();
 	if (childpid < 0)
 		return (-1);
-	else if (childpid != 0)
+	else if (childpid == 0)
 		child_launch_proc(job, proc, in_fd, out_fd);
 	else
 	{

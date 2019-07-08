@@ -5,7 +5,9 @@
 int			get_command_type(char *command)
 {
 	if (strcmp(command, "exit") == 0)
-		return COMMAND_EXIT;
+	    return COMMAND_EXIT;
+    else if (strcmp(command, "help") == 0)
+        return COMMAND_HELP;
 	else if (strcmp(command, "cd") == 0)
 		return COMMAND_CD;
 	else if (strcmp(command, "jobs") == 0)

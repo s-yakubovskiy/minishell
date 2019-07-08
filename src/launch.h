@@ -19,6 +19,7 @@
 #include "minishell.h"
 
 #define NR_JOBS 20
+#define NR_BUILTINS 4
 #define PATH_BUFSIZE 1024
 #define COMMAND_BUFSIZE 1024
 #define TOKEN_BUFSIZE 64
@@ -37,6 +38,7 @@
 #define COMMAND_KILL 6
 #define COMMAND_EXPORT 7
 #define COMMAND_UNSET 8
+#define COMMAND_HELP 9
 
 #define STATUS_RUNNING 0
 #define STATUS_DONE 1
@@ -94,6 +96,14 @@ typedef struct			s_job
 	int					mode;
 }						job;
 
+typedef struct          s_builtins
+{
+    char				builtin_str[NR_BUILTINS][20];
+    int					(*builtin_func[NR_BUILTINS]) (process*);
+    char                **argv;
+    int                 argc;
+}                       g_builtins;
+
 typedef struct 			s_launch
 {
 	process				*proc;
@@ -114,6 +124,7 @@ typedef struct 			s_shell_info
 	char 				**env;
 	char 				**path;
 	struct s_job		*jobs[NR_JOBS + 1];
+	g_builtins          *builtins;
 //	struct h_launch		*launch_h;
 } 						shell_info;
 
@@ -140,7 +151,7 @@ shell_info	*shell;
 
 
 int 				len_two_dim(char **str);
-
+void                sh_update_cwd_info(void);
 
 /*
 ** 				parsing part
@@ -177,6 +188,6 @@ int					shell_launch_process(job *job, process *proc, int in_fd, int out_fd, int
 int					execute_builtin_command(process *proc);
 int					set_process_status(int pid, int status);
 int					print_job_status(int id);
-
+void                built_init(void);
 
 #endif

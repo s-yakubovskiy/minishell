@@ -56,28 +56,13 @@ void check_zombie()
 int execute_builtin_command(process *proc)
 {
 
-	if (proc->type == COMMAND_EXIT)
-		;
-	else if (proc->type == COMMAND_CD)
-		;
-
-
-
-
-//	while (i < num_shell_functions())
-//	{
-//		if (strcmp(args[0], g_env->builtin_str[i]) == 0)
-//		{
-//			if (ft_strequ("env", args[0]))
-//			{
-//				g_env->print_envv(g_env->vault, display_env);
-//				return (1);
-//			}
-//			return (*g_env->builtin_func[i])(args);
-//		}
-//		i++;
-//	}
-	else
-		return (1);
-	return (0);
+    if (proc->type == COMMAND_EXIT)
+        exit_shell(proc);
+    else if (proc->type == COMMAND_CD)
+        cd_shell(proc);
+    else if (proc->type == COMMAND_HELP)
+        help_shell(proc);
+    else
+        return (0);
+    return (1);
 }

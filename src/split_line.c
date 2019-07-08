@@ -67,9 +67,10 @@ static void	ft_distributor(char *t_arr, char **n_arr, char *delim, int w_c)
 	int		i;
 	int		j;
 	int		len;
+	int     x;
 
 	i = -1;
-	g_env->i = 0;
+	x = 0;
 	while (t_arr[++i] != '\0')
 	{
 		j = i;
@@ -79,14 +80,14 @@ static void	ft_distributor(char *t_arr, char **n_arr, char *delim, int w_c)
 			++i;
 			++len;
 		}
-		if (len > 0 && g_env->i < w_c)
+		if (len > 0 && x < w_c)
 		{
-			if ((n_arr[g_env->i] = ft_strnew(len)) == NULL)
+			if ((n_arr[x] = ft_strnew(len)) == NULL)
 			{
-				ft_split_free(n_arr, g_env->i);
+				ft_split_free(n_arr, x);
 				return ;
 			}
-			ft_strncpy(n_arr[(g_env->i)++], t_arr + j, len);
+			ft_strncpy(n_arr[(x++)], t_arr + j, len);
 		}
 	}
 }
