@@ -6,7 +6,7 @@
 /*   By: yharwyn- <yharwyn-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/05/20 17:41:11 by yharwyn-          #+#    #+#             */
-/*   Updated: 2019/07/05 19:40:17 by yharwyn-         ###   ########.fr       */
+/*   Updated: 2019/07/09 14:28:25 by yharwyn-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,8 +86,8 @@ void sh_init()
 
 void sh_print_promt(void)
 {
-	printf(COLOR_CYAN "%s" COLOR_NONE " in " COLOR_YELLOW "%s" COLOR_NONE "\n", shell->cur_user, shell->cur_dir);
-	printf(COLOR_CYAN "21sh>" COLOR_NONE " ");
+//	printf(COLOR_CYAN "%s" COLOR_NONE " in " COLOR_YELLOW "%s" COLOR_NONE "\n", shell->cur_user, shell->cur_dir);
+	printf(COLOR_YELLOW "21sh>" COLOR_NONE " ");
 }
 
 

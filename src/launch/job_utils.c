@@ -7,8 +7,8 @@
 int			release_job(int id)
 {
 	job		*job;
-	process *proc;
-	process *tmp;
+	process	*proc;
+	process	*tmp;
 
 	if (id > NR_JOBS || shell->jobs[id] == NULL)
 		return -1;
